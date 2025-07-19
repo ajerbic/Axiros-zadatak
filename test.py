@@ -77,7 +77,6 @@ def main():
     # Final cleanup: stop both containers
     print("\n=== Cleaning up: Stopping all services ===")
     stop_service("service2")
-    stop_service("service1")
 
 if __name__ == "__main__":
     main()
