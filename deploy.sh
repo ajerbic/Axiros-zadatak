@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Defaults
-VERSION1="latest"
-VERSION2="latest"
+VERSION1="v1.0"
+VERSION2="v1.0"
 ADDITIONAL_PARAM_1=""
 
 DOCKER_USER="ajerbic"
