@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-SERVICE1_URL = "http://service1:8081"
+SERVICE1_URL = "http://service1:8080"
 VALID_FORMATS = {"iso", "epoch"}
 
 @app.route("/", methods=["POST"])
@@ -14,9 +14,12 @@ def handle_request():
     if format_type not in VALID_FORMATS:
         return Response("Invalid format type. Use 'iso' or 'epoch'.", status=400)
 
+    # Map epoch to timestamp for service1
+    service1_format = "timestamp" if format_type == "epoch" else format_type
+
     try:
         # Ask Service1 for timestamp string
-        response = requests.post(SERVICE1_URL, data=format_type, timeout=3)
+        response = requests.post(SERVICE1_URL, data=service1_format, timeout=3)
         response.raise_for_status()
         timestamp = response.text.strip()
     except requests.RequestException:
@@ -35,4 +38,4 @@ def handle_request():
         return Response(f"Invalid timestamp format from Service1: {str(e)}", status=500)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8082)
+    app.run(host="0.0.0.0", port=8080)

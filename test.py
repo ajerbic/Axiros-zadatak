@@ -27,36 +27,46 @@ def test_service(url, input_data, description):
     try:
         print(f"\nTest: {description}")
         response = requests.post(url, data=input_data, timeout=5)
-        # Instead of raising immediately, show status code and response text
         print(f"Status code: {response.status_code}")
         print(f"Response: {response.text.strip()}")
-        response.raise_for_status()  # still raise for unexpected errors if you want
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP error: {e} - Response content: {e.response.text.strip() if e.response else 'No content'}")
+        # Don't raise for status - we want to see 4xx responses
+        if response.status_code >= 500:
+            print(f"Server error occurred")
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
 
 def stop_service(container_name):
     print(f"\nStopping container: {container_name}")
-    subprocess.run(["docker", "stop", container_name], capture_output=True)
+    result = subprocess.run(["docker", "stop", container_name], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Warning: Failed to stop {container_name} - it may not be running")
 
 def start_service(container_name, version, port):
     print(f"\nStarting container: {container_name}")
-    subprocess.run([
+    result = subprocess.run([
         "docker", "run", "-d", "--rm",
         "--name", container_name,
         "--network", "microservices-net",
         "-p", f"{port}:8080",
         f"ajerbic/{container_name}:{version}"
-    ], capture_output=True)
+    ], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Error starting container: {result.stderr}")
     time.sleep(3)
 
 def main():
-    print("=== Input Validation Tests ===")
+    print("=== Valid Input Tests ===")
+    # Test valid inputs first
+    test_service(SERVICE1_URL, "iso", "Service1 valid input: 'iso'")
+    test_service(SERVICE1_URL, "timestamp", "Service1 valid input: 'timestamp'")
+    test_service(SERVICE2_URL, "iso", "Service2 valid input: 'iso'")
+    test_service(SERVICE2_URL, "epoch", "Service2 valid input: 'epoch'")
+
+    print("\n=== Input Validation Tests ===")
     invalid_inputs = ["", "foobar", "123abc", "\n", "TIMESTAMP"]
     for invalid in invalid_inputs:
-        test_service(SERVICE1_URL, invalid, f"Service1 invalid input: '{invalid}'")
-        test_service(SERVICE2_URL, invalid, f"Service2 invalid input: '{invalid}'")
+        test_service(SERVICE1_URL, invalid, f"Service1 invalid input: '{repr(invalid)}'")
+        test_service(SERVICE2_URL, invalid, f"Service2 invalid input: '{repr(invalid)}'")
 
     print("\n=== Error Handling Test: Service1 Down ===")
     stop_service("service1")
