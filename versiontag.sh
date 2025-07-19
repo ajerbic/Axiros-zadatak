@@ -14,11 +14,11 @@ TAGS=$(curl -s "https://registry.hub.docker.com/v2/repositories/${USERNAME}/${RE
 LATEST_TAG=$(echo "$TAGS" | tail -n 1)
 
 if [[ -z "$LATEST_TAG" ]]; then
-  echo "❌ No version tags found."
+  echo "No version tags found."
   exit 1
 fi
 
-echo "✅ Latest tag: $LATEST_TAG"
+echo "Latest tag: $LATEST_TAG"
 
 # === Extract version numbers ===
 VERSION="${LATEST_TAG#v}"
@@ -43,4 +43,4 @@ else
   NEXT_TAG="v$MAJOR.$MINOR"
 fi
 
-echo "➡️  Suggested next version: $NEXT_TAG"
+echo "Suggested next version: $NEXT_TAG"

@@ -82,6 +82,6 @@ docker run -d --rm --name service2 --network microservices-net -p 8082:8080 \
   $DOCKER_USER/service2:$VERSION2
 
 echo ""
-echo "✅ Services are running:"
+echo "Services are running:"
 echo " - Service1: http://localhost:8081"
 echo " - Service2: http://localhost:8082"

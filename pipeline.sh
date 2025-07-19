@@ -74,7 +74,7 @@ if $UPDATE2; then
   TAG2=$NEXT2
 fi
 
-echo "🛠️  Building versions:"
+echo "Building versions:"
 echo " - Service1: $TAG1 (latest was $LATEST1)"
 echo " - Service2: $TAG2 (latest was $LATEST2)"
 
@@ -90,26 +90,26 @@ docker run -d --rm --name service1 --network $NETWORK -p 8081:8080 $DOCKER_USER/
 docker run -d --rm --name service2 --network $NETWORK -p 8082:8080 $DOCKER_USER/service2:$TAG2
 
 # === Run test suite ===
-echo "🧪 Running test script..."
+echo "Running test script..."
 python3 "$TEST_SCRIPT"
 
 # === Evaluate test results ===
 if grep -q ': 0' "$RESULTS_FILE"; then
-  echo "❌ Some tests failed. Not pushing to Docker Hub."
+  echo "Some tests failed. Not pushing to Docker Hub."
   exit 1
 else
-  echo "✅ All tests passed."
+  echo "All tests passed."
 fi
 
 # === Push updated services only ===
 if $UPDATE1; then
-  echo "📤 Pushing service1:$TAG1..."
+  echo "Pushing service1:$TAG1..."
   docker push $DOCKER_USER/service1:$TAG1
 fi
 
 if $UPDATE2; then
-  echo "📤 Pushing service2:$TAG2..."
+  echo "Pushing service2:$TAG2..."
   docker push $DOCKER_USER/service2:$TAG2
 fi
 
-echo "🎉 Done. Services tested and pushed (if selected)."
+echo "Done. Services tested and pushed (if selected)."
