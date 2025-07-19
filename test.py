@@ -27,8 +27,12 @@ def test_service(url, input_data, description):
     try:
         print(f"\nTest: {description}")
         response = requests.post(url, data=input_data, timeout=5)
-        response.raise_for_status()
+        # Instead of raising immediately, show status code and response text
+        print(f"Status code: {response.status_code}")
         print(f"Response: {response.text.strip()}")
+        response.raise_for_status()  # still raise for unexpected errors if you want
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP error: {e} - Response content: {e.response.text.strip() if e.response else 'No content'}")
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
 
