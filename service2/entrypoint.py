@@ -1,41 +1,43 @@
-from flask import Flask, request, Response
-from datetime import datetime
+import sys
 import requests
-
-app = Flask(__name__)
+from datetime import datetime
 
 SERVICE1_URL = "http://service1:8080"
 VALID_FORMATS = {"iso", "epoch"}
 
-@app.route("/", methods=["POST"])
-def handle_request():
-    format_type = request.get_data(as_text=True).strip().lower()
-
-    if format_type not in VALID_FORMATS:
-        return Response("Invalid format type. Use 'iso' or 'epoch'.", status=400)
-
+def main():
+    # Read input from stdin (this is how fwatchdog passes data)
+    input_data = sys.stdin.read().strip().lower()
+    
+    # Validate format
+    if input_data not in VALID_FORMATS:
+        print("Invalid format type. Use 'iso' or 'epoch'.")
+        sys.exit(1)
+    
     # Map epoch to timestamp for service1
-    service1_format = "timestamp" if format_type == "epoch" else format_type
-
+    service1_format = "timestamp" if input_data == "epoch" else input_data
+    
     try:
         # Ask Service1 for timestamp string
         response = requests.post(SERVICE1_URL, data=service1_format, timeout=3)
         response.raise_for_status()
         timestamp = response.text.strip()
-    except requests.RequestException:
-        return Response("Service1 is unavailable.", status=503)
-
+    except requests.RequestException as e:
+        print("Service1 is unavailable.")
+        sys.exit(1)
+    
     try:
-        if format_type == "iso":
+        if input_data == "iso":
             # Parse ISO format timestamp and format date output
             dt = datetime.fromisoformat(timestamp)
-            return dt.strftime("%Y-%m-%d")
+            print(dt.strftime("%Y-%m-%d"))
         else:  # epoch
             # Parse epoch timestamp string to int and convert to datetime
             dt = datetime.utcfromtimestamp(int(timestamp))
-            return dt.strftime("%Y-%m-%d")
+            print(dt.strftime("%Y-%m-%d"))
     except Exception as e:
-        return Response(f"Invalid timestamp format from Service1: {str(e)}", status=500)
+        print(f"Invalid timestamp format from Service1: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    main()
