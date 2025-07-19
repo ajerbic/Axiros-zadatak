@@ -1,0 +1,56 @@
+=== Input Validation Tests ===
+
+Test: Service1 invalid input: ''
+Response: /entrypoint.py:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.datetime.utcnow()
+2025-07-19T14:14:22.095533
+
+Test: Service2 invalid input: ''
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+Test: Service1 invalid input: 'foobar'
+Response: /entrypoint.py:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.datetime.utcnow()
+2025-07-19T14:14:22.319027
+
+Test: Service2 invalid input: 'foobar'
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+Test: Service1 invalid input: '123abc'
+Response: /entrypoint.py:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.datetime.utcnow()
+2025-07-19T14:14:22.544414
+
+Test: Service2 invalid input: '123abc'
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+Test: Service1 invalid input: '
+'
+Response: /entrypoint.py:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.datetime.utcnow()
+2025-07-19T14:14:22.780526
+
+Test: Service2 invalid input: '
+'
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+Test: Service1 invalid input: 'TIMESTAMP'
+Response: /entrypoint.py:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.datetime.utcnow()
+2025-07-19T14:14:22.994187
+
+Test: Service2 invalid input: 'TIMESTAMP'
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+=== Error Handling Test: Service1 Down ===
+
+Stopping container: service1
+
+Test: Service2 request when Service1 is stopped
+Request failed: 500 Server Error: Internal Server Error for url: http://localhost:8082/
+
+=== Cleaning up: Stopping all services ===
+
+Stopping container: service2
+
+Stopping container: service1
